@@ -48,7 +48,7 @@ var output = ee.Image(0)
 
 // export
 Export.image.toAsset({
-    "image": output,
+    "image": output.toInt32(),
     "description": 'secondary_vegetation_trajs_by_age_v1',
     "assetId": 'users/dh-conciani/embrapa_trajs/secondary_vegetation_trajs_by_age_v1',
     "scale": 30,
