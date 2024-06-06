@@ -40,7 +40,24 @@ yearsList.forEach(function(year_i) {
   sourceClass = sourceClass.blend(x).selfMask();
 });
 
+// combine layers into a single image
+var output = ee.Image(0)
+  .add(destinationClass).multiply(100)
+    .add(secVeg).multiply(100)
+      .add(sourceClass);
 
+// export
+Export.image.toAsset({
+    "image": output,
+    "description": 'secondary_vegetation_trajs_by_age_v1',
+    "assetId": 'users/dh-conciani/embrapa_trajs/secondary_vegetation_trajs_by_age_v1',
+    "scale": 30,
+    "pyramidingPolicy": {
+        '.default': 'mode'
+    },
+    "maxPixels": 1e13,
+    "region": ecoregions.geometry()
+});  
 
 
 // import the color ramp module from mapbiomas 
@@ -51,8 +68,9 @@ var vis = {
     'palette': palettes.get('classification7')
 };
 
-Map.addLayer(secVeg, {palette: ['red', 'yellow', 'green'], min: 1, max:20}, 'secondary age');
 Map.addLayer(destinationClass, vis, 'destination class');
+Map.addLayer(secVeg, {palette: ['red', 'yellow', 'green'], min: 1, max:20}, 'secondary age');
 //Map.addLayer(transitionYear.randomVisualizer(), {}, 'transition year')
 //Map.addLayer(collection, {}, 'collection', false);
 Map.addLayer(sourceClass, vis, 'source class');
+Map.addLayer(output.randomVisualizer(), {}, 'output', false)
