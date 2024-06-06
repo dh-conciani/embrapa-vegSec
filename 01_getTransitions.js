@@ -1,6 +1,9 @@
 // get secondary vegetation age for a reference year and their previous land use 
 // dhemerson conciani (dhemerson.costa@ipam.org.br)
 
+// load ecoregions
+var ecoregions = ee.FeatureCollection('users/dh-conciani/help/embrapa/ecoregions');
+
 // read mapbiomas collection
 var collection = ee.Image('projects/mapbiomas-workspace/public/collection8/mapbiomas_collection80_integration_v1');
 
@@ -17,10 +20,39 @@ var secVeg = secVeg.select('secondary_vegetation_age_' + year)
 // get class in the reference year
 var destinationClass = collection.select('classification_' + year)
   .updateMask(secVeg);
+  
+// get year of transition
+var transitionYear = ee.Image(year - 1).subtract(secVeg).selfMask();
+
+// set list of years to be assessed
+var yearsList = ee.List.sequence({'start': 1985, 'end': year}).getInfo();
+
+// create empty recipe
+var sourceClass = ee.Image(0);
+// for each year
+yearsList.forEach(function(year_i) {
+  // get mask
+  var mask = transitionYear.updateMask(transitionYear.eq(year_i));
+  // get class
+  var x = collection.select('classification_' + year_i)
+    .updateMask(mask);
+  // store
+  sourceClass = sourceClass.blend(x).selfMask();
+});
 
 
-// 
 
 
-Map.addLayer(secVeg, {palette: ['red', 'yellow', 'green'], min: 1, max:20}, 'secondary age')
-Map.addLayer(destinationClass.randomVisualizer(), {}, 'destination class')
+// import the color ramp module from mapbiomas 
+var palettes = require('users/mapbiomas/modules:Palettes.js');
+var vis = {
+    'min': 0,
+    'max': 62,
+    'palette': palettes.get('classification7')
+};
+
+Map.addLayer(secVeg, {palette: ['red', 'yellow', 'green'], min: 1, max:20}, 'secondary age');
+Map.addLayer(destinationClass, vis, 'destination class');
+//Map.addLayer(transitionYear.randomVisualizer(), {}, 'transition year')
+//Map.addLayer(collection, {}, 'collection', false);
+Map.addLayer(sourceClass, vis, 'source class');
