@@ -59,7 +59,7 @@ ecoregions.aggregate_array('ID').evaluate(function(IDs){
     Export.image.toAsset({
         "image": output.toInt32(),
         "description": ID + '_v1',
-        "assetId": 'users/dh-conciani/embrapa_trajs/' + feature.get('ID').getInfo() + '_v1',
+        "assetId": 'users/dh-conciani/embrapa_trajs/' + ID + '_v1',
         "scale": 30,
         "pyramidingPolicy": {
             '.default': 'mode'
