@@ -5,7 +5,8 @@
 // calculate area of @author João Siqueira
 
 // set input image collection
-var data = ee.ImageCollection('users/dh-conciani/embrapa_trajs/');
+var data = ee.ImageCollection('users/dh-conciani/embrapa_trajs')
+  .mosaic();
 
 // define years to be computed
 var bands = ['constant'];
